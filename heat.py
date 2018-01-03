@@ -46,15 +46,53 @@ def outline_kernel():
                      [-1, 5, -1],
                      [0, -1, 0]])
 
+def epislon_range(pixel, c):
+
+    epsilon = 5.0 / 255.0
+    if c - epsilon < pixel < c + epsilon:
+
+        return pixel
+
+    else:
+
+        return 0.0
+
+def heat_map(map, colours):
+
+    heat = np.zeros_like(map)
+
+    for c in colours:
+        r, g, b = c
+
+        for channel in range(map.shape[-1]):
+            for height in range(map.shape[0]):
+                for width in range(map.shape[1]):
+
+                    pixel = map[height, width, channel]
+
+                    if channel == 0:
+
+                        heat[height, width, channel] = epislon_range(pixel, r)
+
+                    elif channel == 1:
+
+                        heat[height, width, channel] = epislon_range(pixel, g)
+
+                    elif channel == 2:
+
+                        heat[height, width, channel] = epislon_range(pixel, b)
+
+
+    return heat
 
 if __name__ == '__main__':
 
-    outline = outline_kernel()
+    map = plt.imread("Maps/9.png")
 
-    map = plt.imread("Maps/1.png")
+    heatmap = heat_map(map, [(0.8666666666666667, 0.09411764705882353, 0.10980392156862745)])
 
-    conv_map = convolution(map, outline)
     plt.imshow(map)
     plt.show()
-    plt.imshow(conv_map)
+
+    plt.imshow(heatmap)
     plt.show()
