@@ -57,7 +57,7 @@ def epislon_range(pixel, c):
 
         return 0.0
 
-def heat_map(map, colours):
+def pixel_by_pixel(map, colours):
 
     heat = np.zeros_like(map)
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     map = plt.imread("Maps/9.png")
 
-    heatmap = heat_map(map, [(0.8666666666666667, 0.09411764705882353, 0.10980392156862745)])
+    heatmap = pixel_by_pixel(map, [(0.8666666666666667, 0.09411764705882353, 0.10980392156862745)])
 
     plt.imshow(map)
     plt.show()
