@@ -19,8 +19,8 @@ public class ImageProcessor extends JPanel {
     static int windowScale = 35;
     static boolean zoom = true;
 
-    static String[] waldos = new File(path+"/Hey-Waldo-master/64/waldo").list();
-    static int waldo = 6; // Last Switched = 13_2_11.jpg
+    static String[] waldos = {path+"/Hey-Waldo-master/128/waldo/9_0_6.jpg"};//new File(path+"/Hey-Waldo-master/128/waldo").list();
+    static int waldo = -1; // Last Switched = 9_0_10.jpg
 
     public static void main(String[] args){
         ImageProcessor ip = new ImageProcessor();
@@ -77,7 +77,7 @@ public class ImageProcessor extends JPanel {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_S){
+                if (zoom && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_S){
                     try {
                         String[] croppedWaldos = new File(path+"/Cropped Waldos").list();
                         String outputFileName = "Waldo";
@@ -114,8 +114,8 @@ public class ImageProcessor extends JPanel {
         ++waldo;
         if (waldo < waldos.length){
             try{
-                System.out.println("Switching to:   "+waldos[waldo]);
-                bi = ImageIO.read(new FileInputStream(path+"/Hey-Waldo-master/64/waldo/"+waldos[waldo]));
+                System.out.println("Switching to:   "+waldos[waldo]+"    ("+waldo+")");
+                bi = ImageIO.read(new FileInputStream(waldos[waldo]));
                 imageX = 0;
                 imageY = 0;
                 imageStep = 1;
@@ -124,6 +124,10 @@ public class ImageProcessor extends JPanel {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+        }
+        else{
+            System.out.println("All Waldos cropped!");
+            System.exit(0);
         }
     }
 
