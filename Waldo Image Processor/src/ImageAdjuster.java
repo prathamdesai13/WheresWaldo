@@ -11,33 +11,39 @@ import java.io.IOException;
 /**
  * Created by Antonio on 2018-01-03.
  */
-public class ImageProcessor extends JPanel {
+public class ImageAdjuster extends JPanel {
 
     static final String path = "..";
 
-    static int desiredWidth = 35, desiredHeight = 35;
-    static int windowScale = 40;
+    static int desiredWidth = 30, desiredHeight = 30;
+    static int windowScale = 35;
     static boolean zoom = true;
 
-    static File[] waldos = new File(path+"/Hey-Waldo-master/256/waldo").listFiles();//{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
-    static int waldo = -1;
+    static File[] waldos = new File(path+"/Cropped Waldos/Waldos 35x35").listFiles(); //{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
+    static int waldo = -1; // Last Switched = 9_0_10.jpg
 
     public static void main(String[] args){
-        ImageProcessor ip = new ImageProcessor();
-        JFrame frame = new JFrame("Waldo Image Processor by Antonio Kim");
-        frame.add(ip);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setSize(desiredWidth*windowScale, desiredHeight*windowScale);
-        ip.requestFocus();
+        ImageAdjuster ip = new ImageAdjuster();
+        while (waldo < waldos.length){
+            ip.switchWaldo();
+            ip.saveWaldo();
+            ip.moveImageToRightSide();
+            ip.saveWaldo();
+            ip.moveImageToBottom();
+            ip.saveWaldo();
+            ip.moveImageToLeftSide();
+            ip.saveWaldo();
+            ip.imageY += windowScale*ip.imageStep*2.5;
+            ip.imageX -= windowScale*ip.imageStep*2.5;
+            ip.saveWaldo();
+        }
     }
 
     int imageX = 0, imageY = 0, imageStep = 1;
     BufferedImage bi = null;
-    public ImageProcessor(){
+    public ImageAdjuster(){
         this.setSize(desiredWidth*windowScale, desiredHeight*windowScale);
-        switchWaldo();
+        //switchWaldo();
         repaint();
         addKeyListener(new KeyListener() {
             @Override
@@ -55,39 +61,19 @@ public class ImageProcessor extends JPanel {
                     System.out.println("ImageStep:   "+imageStep);
                 }
                 else if (e.getKeyCode() == KeyEvent.VK_UP){
-                    if (e.isControlDown()){
-                        moveImageToTop();
-                    }
-                    else {
-                        moveImageUp();
-                    }
+                    moveImageUp();
                     repaint();
                 }
                 else if (e.getKeyCode() == KeyEvent.VK_DOWN){
-                    if (e.isControlDown()){
-                        moveImageToBottom();
-                    }
-                    else {
-                        moveImageDown();
-                    }
+                    moveImageDown();
                     repaint();
                 }
                 else if (e.getKeyCode() == KeyEvent.VK_LEFT){
-                    if (e.isControlDown()){
-                        moveImageToLeftSide();
-                    }
-                    else {
-                        moveImageLeft();
-                    }
+                    moveImageLeft();
                     repaint();
                 }
                 else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
-                    if (e.isControlDown()){
-                        moveImageToRightSide();
-                    }
-                    else {
-                        moveImageRight();
-                    }
+                    moveImageRight();
                     repaint();
                 }
             }
@@ -139,7 +125,7 @@ public class ImageProcessor extends JPanel {
     }
     public void saveWaldo(){
         try {
-            String[] croppedWaldos = new File(path+"/Cropped Waldos/Waldos 35x35").list();
+            String[] croppedWaldos = new File(path+"/Cropped Waldos/Waldos 30x30").list();
             String outputFileName = "Waldo";
             NUM: for (int i = 1;; ++i){
                 for (String name : croppedWaldos){
@@ -150,7 +136,7 @@ public class ImageProcessor extends JPanel {
                 outputFileName += i;
                 break;
             }
-            File outputfile = new File(path+"/Cropped Waldos/Waldos 35x35/"+outputFileName+".png");
+            File outputfile = new File(path+"/Cropped Waldos/Waldos 30x30/"+outputFileName+".png");
             System.out.println(-imageX/windowScale+", "+-imageY/windowScale+", "+desiredWidth+", "+desiredHeight);
             ImageIO.write(bi.getSubimage(-imageX/windowScale, -imageY/windowScale, desiredWidth, desiredHeight), "png", outputfile);
 
