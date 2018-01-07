@@ -15,7 +15,7 @@ public class ImageAdjuster extends JPanel {
 
     static final String path = "..";
 
-    static int desiredWidth = 30, desiredHeight = 30;
+    static int desiredWidth = 32, desiredHeight = 32;
     static int windowScale = 35;
     static boolean zoom = true;
 
@@ -33,8 +33,8 @@ public class ImageAdjuster extends JPanel {
             ip.saveWaldo();
             ip.moveImageToLeftSide();
             ip.saveWaldo();
-            ip.imageY += windowScale*ip.imageStep*2.5;
-            ip.imageX -= windowScale*ip.imageStep*2.5;
+            ip.imageY += windowScale*ip.imageStep*1.5;
+            ip.imageX -= windowScale*ip.imageStep*1.5;
             ip.saveWaldo();
         }
     }
