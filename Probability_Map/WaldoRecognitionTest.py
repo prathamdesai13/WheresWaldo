@@ -25,4 +25,4 @@ def test(path):
 
 if __name__ == "__main__":
     # train()
-    test("./Waldo Recognizer 2018-01-06  21_40_45.ckpt")
+    test("./Waldo Recognizer 2018-01-07  15_29_00.ckpt")

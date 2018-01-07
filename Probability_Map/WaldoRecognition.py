@@ -28,27 +28,27 @@ class WaldoRecogonizer:
         self.input = tf.placeholder(tf.float32, shape=[32, 32, 3])
         self.output = tf.placeholder(tf.float32, shape=[1])
 
-        self.weights1 = weight_variable([5, 5, 3, 32])
-        self.biases1 = bias_variable([32])
+        self.weights1 = weight_variable([5, 5, 3, 16])
+        self.biases1 = bias_variable([16])
 
         self.reshaped_input = tf.reshape(self.input, [-1, 32, 32, 3])
 
-        self.conv1 = tf.nn.relu(conv2d(self.reshaped_input, self.weights1) + self.biases1)
+        self.conv1 = tf.nn.sigmoid(conv2d(self.reshaped_input, self.weights1) + self.biases1)
         self.pool1 = max_pool_2x2(self.conv1)
 
-        self.weights2 = weight_variable([5, 5, 32, 64])
-        self.biases2 = bias_variable([64])
+        self.weights2 = weight_variable([5, 5, 16, 32])
+        self.biases2 = bias_variable([32])
 
-        self.conv2 = tf.nn.softmax(conv2d(self.pool1, self.weights2) + self.biases2)
+        self.conv2 = tf.nn.sigmoid(conv2d(self.pool1, self.weights2) + self.biases2)
         self.pool2 = max_pool_2x2(self.conv2)
 
-        self.fc_weights1 = weight_variable([8 * 8 * 64, 1024])
-        self.fc_biases1 = bias_variable([1024])
+        self.fc_weights1 = weight_variable([8 * 8 * 32, 512])
+        self.fc_biases1 = bias_variable([512])
 
-        self.h_pool2_flat = tf.reshape(self.pool2, [-1, 8 * 8 * 64])
-        self.h_fc1 = tf.nn.softmax(tf.matmul(self.h_pool2_flat, self.fc_weights1) + self.fc_biases1)
+        self.h_pool2_flat = tf.reshape(self.pool2, [-1, 8 * 8 * 32])
+        self.h_fc1 = tf.nn.sigmoid(tf.matmul(self.h_pool2_flat, self.fc_weights1) + self.fc_biases1)
 
-        self.fc_weights2 = weight_variable([1024, 1])
+        self.fc_weights2 = weight_variable([512, 1])
         self.fc_biases2 = bias_variable([1])
 
         self.network = tf.matmul(self.h_fc1, self.fc_weights2) + self.fc_biases2
@@ -57,7 +57,7 @@ class WaldoRecogonizer:
         output = session.run(self.network, {self.input: input})
         return output
 
-    def train(self, session, training_data, labels, learning_rate=1e-4):
+    def train(self, session, training_data, labels, learning_rate=1e-2):
 
         cross_entropy = tf.reduce_mean(
             tf.nn.softmax_cross_entropy_with_logits(labels=self.output, logits=self.network))
@@ -69,7 +69,6 @@ class WaldoRecogonizer:
         for x, y in zip(training_data, labels):
             session.run(train_step, feed_dict={self.input: x, self.output: y})
 
-        print(self.save_variables(session))
 
 
     def save_variables(self, session, path=None):
@@ -85,4 +84,6 @@ if __name__ == "__main__":
     training_data = load_waldo_pkl()
 
     with tf.Session() as session:
-        wr.train(session, training_data, [np_array([1]) for _ in range(len(training_data))])
+        for _ in range(2):
+            wr.train(session, training_data, [np_array([1]) for _ in range(len(training_data))])
+        print(wr.save_variables(session))
