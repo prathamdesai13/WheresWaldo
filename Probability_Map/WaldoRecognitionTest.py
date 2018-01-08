@@ -1,28 +1,33 @@
 import tensorflow as tf
 
-from Probability_Map.WaldoPKL import load_waldo_pkl
-from Probability_Map.WaldoRecognition import WaldoRecogonizer
+from Probability_Map.WaldoPKL import load_waldo_pkl, load_not_waldo_pkl
 
 
-def test(path):
+def test_waldo(path):
 
     with tf.Session() as session:
-        wr = WaldoRecogonizer()
+        training_data1 = load_waldo_pkl()
+        training_data2 = load_not_waldo_pkl()
 
-        training_data = load_waldo_pkl()
+        saver = tf.train.import_meta_graph(path+'.meta')
+        saver.restore(session, tf.train.latest_checkpoint('./'))
 
-        tf.train.Saver().restore(session, path)
-
-        session.run(tf.global_variables_initializer())
-
-        # for x, p in zip(training_data, probabilities):
+        # for x, p in zip(training_data1, probabilities):
         #     p.append(wr.run(session, x))
 
-        for x in training_data:
-            print(wr.run(session, x))
+        graph = tf.get_default_graph()
+        network = graph.get_tensor_by_name("network:0")
+
+        input = graph.get_tensor_by_name("input:0")
+
+        for x in training_data1:
+            print(session.run(network, {input:x}))
+        print("________________________________________________")
+        for x in training_data2:
+            print(session.run(network, {input:x}))
 
 
 
 if __name__ == "__main__":
     # train()
-    test("./Waldo Recognizer 2018-01-06  21_40_45.ckpt")
+    test_waldo("./Waldo Recognizer  2018-01-07 17_31_49")
