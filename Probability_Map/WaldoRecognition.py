@@ -28,36 +28,36 @@ class WaldoRecogonizer:
     def __init__(self):
 
         self.input = tf.placeholder(tf.float32, shape=[32, 32, 3], name="input")
-        self.output = tf.placeholder(tf.float32, shape=[1, 2])
+        self.output = tf.placeholder(tf.float32, shape=[1])
 
         self.weights1 = weight_variable([5, 5, 3, 16], "weights1")
         self.biases1 = bias_variable([16], "biases1")
 
         reshaped_input = tf.reshape(self.input, [1, 32, 32, 3])
 
-        conv1 = tf.nn.sigmoid(tf.add(conv2d(reshaped_input, self.weights1), self.biases1))
+        conv1 = tf.nn.relu(tf.add(conv2d(reshaped_input, self.weights1), self.biases1))
         pool1 = max_pool_2x2(conv1)
 
         self.weights2 = weight_variable([5, 5, 16, 32], "weights2")
         self.biases2 = bias_variable([32], "biases2")
 
-        conv2 = tf.nn.sigmoid(tf.add(conv2d(pool1, self.weights2), self.biases2))
+        conv2 = tf.nn.relu(tf.add(conv2d(pool1, self.weights2), self.biases2))
         pool2 = max_pool_2x2(conv2)
 
         self.fc_weights1 = weight_variable([8 * 8 * 32, 512], "fc_weights1")
         self.fc_biases1 = bias_variable([512], "fc_biases1")
 
         h_pool2_flat = tf.reshape(pool2, [-1, 8 * 8 * 32])
-        h_fc1 = tf.nn.sigmoid(tf.matmul(h_pool2_flat, self.fc_weights1) + self.fc_biases1)
+        h_fc1 = tf.nn.tanh(tf.add(tf.matmul(h_pool2_flat, self.fc_weights1), self.fc_biases1))
 
-        self.fc_weights2 = weight_variable([512, 2], "fc_weights2")
-        self.fc_biases2 = bias_variable([2], "fc_biases2")
+        self.fc_weights2 = weight_variable([512, 1], "fc_weights2")
+        self.fc_biases2 = bias_variable([1], "fc_biases2")
 
-        self.network = tf.add(tf.matmul(h_fc1, self.fc_weights2), self.fc_biases2, "network")
+        self.network = tf.nn.sigmoid(tf.add(tf.matmul(h_fc1, self.fc_weights2), self.fc_biases2), name="network")
 
         self.loss = tf.reduce_mean(
-            tf.nn.sigmoid_cross_entropy_with_logits(labels=self.output, logits=self.network))
-        self.train_step = tf.train.AdagradOptimizer(1e-5).minimize(self.loss)
+            tf.nn.softmax_cross_entropy_with_logits(labels=self.output, logits=self.network))
+        self.train_step = tf.train.AdamOptimizer(1e-6).minimize(self.loss)
         # correct_prediction = tf.equal(self.network, self.output)
         # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
@@ -83,14 +83,16 @@ if __name__ == "__main__":
         session.run(tf.global_variables_initializer())
 
         training_data1 = load_waldo_pkl()
-        labels1 = [np_array([[1, 0]]) for _ in range(len(training_data1))]
+        labels1 = [np_array([1]) for _ in range(len(training_data1))]
         training_data2 = load_not_waldo_pkl()
-        labels2 = [np_array([[0, 1]]) for _ in range(len(training_data2))]
-        for _ in range(3):
-            training_data = [[x, y] for x, y in zip(training_data1, labels1)]
-            for x, y in zip(training_data2, labels2):
-                training_data.append([x, y])
-            shuffle(training_data)
+        labels2 = [np_array([0]) for _ in range(len(training_data2))]
+        for _ in range(1):
+            shuffle(training_data1)
+            shuffle(training_data2)
+            training_data = []
+            for i in range(50):
+                training_data.append([training_data1[i], np_array([1])])
+                training_data.append([training_data2[i], np_array([0])])
             wr.train(session, training_data)
 
         saver = tf.train.Saver()
