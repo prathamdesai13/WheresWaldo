@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import colorsys
+import cv2
 
 def normalize(pix):
 
@@ -101,33 +103,17 @@ def rgb_to_primary(map):
 
             pixel = map[h, w]
 
-            r, g, b = pixel
+            for i in range(len(pixel)):
 
-            if r > 127.0 / 255.0:
+                if pixel[i] > 127.0 / 255.0:
 
-                r = 1.0
+                    pixel[i] = 1.0
 
-            else:
+                else:
 
-                r = 0.0
+                    pixel[i] = 0.0
 
-            if g > 127.0 / 255.0:
-
-                g = 1.0
-
-            else:
-
-                g = 0.0
-
-            if b > 127.0 / 255.0:
-
-                b = 1.0
-
-            else:
-
-                b = 0.0
-
-            primary_map[h, w] = (r, g, b)
+            primary_map[h, w] = pixel
 
     return primary_map
 
@@ -156,6 +142,10 @@ def filter(map, color):
 
                 mono_map[h, w] = pixel
 
+            else:
+
+                mono_map[h, w] = (0.0, 1.0, 0.0)
+
     return mono_map
 
 def crop_map(map, crop):
@@ -170,9 +160,9 @@ def crop_map(map, crop):
 
             square = map[crop_height * h:crop_height * (h + 1), crop_width * w:crop_width * (w + 1)]
 
-            error = abs(np.sum(square - crop)) / (crop_height * crop_width)
+            error = abs(np.sum(np.power(square - crop, 2))) / (crop_height * crop_width)
             print(error)
-            if error < 0.3:
+            if error < 1.4:
 
                 cropped[crop_height * h:crop_height * (h + 1), crop_width * w:crop_width * (w + 1)] = square
 
@@ -182,6 +172,27 @@ def crop_map(map, crop):
 
     return cropped
 
+def get_waldo_stripes(map):
+
+    stripes = np.zeros_like(map)
+
+    for height in range(map.shape[0]):
+        for width in range(map.shape[1]):
+
+            r, g, b = map[height, width]
+
+            h, s, v = colorsys.rgb_to_hsv(r, g, b)
+
+            if (h < 0.05 or h > 0.95) and s > 0.4 and v > 0.4:
+
+                stripes[height, width] = map[height, width]
+
+            elif s < 0.2 and v > 0.9:
+
+                stripes[height, width] = map[height, width]
+
+    return stripes
+
 
 if __name__ == '__main__':
 
@@ -189,39 +200,20 @@ if __name__ == '__main__':
     black = (0.0, 0.0, 0.0)
     red = (1.0, 0.0, 0.0)
 
-    map = plt.imread("Maps/9.png")
+    map = plt.imread("Cropped Waldos/Waldos 32x32/Waldo2.png")
 
-    #heatmap = pixel_by_pixel(map, [(0.8666666666666667, 0.09411764705882353, 0.10980392156862745)])
+    map = plt.imread("Maps/19.png")
 
-    grey_map = rgb_to_gray(map)
     primary_map = rgb_to_primary(map)
     filter_map = filter(primary_map, color=[(1.0, 0.0, 0.0), (1.0, 1.0, 1.0)])
 
-    crop = np.zeros((30, 30, 3))
+    #dilate_stripes = cv2.dilate(filter_map, np.ones((1, 1), np.uint8))
 
-    for h in range(30):
+    stripes = get_waldo_stripes(filter_map)
 
-        if h < 6:
+    dilate_stripes = cv2.dilate(stripes, np.ones((1, 3), np.uint8))
 
-            crop[h, :, :] = red
-
-        elif 6 < h < 16:
-
-            crop[h, :, :] = white
-
-        elif 16 < h < 24:
-
-            crop[h, :, :] = red
-
-        else:
-
-            crop[h, :, :] = black
-
-    cropped = crop_map(filter_map, crop)
     plt.imshow(map)
-    plt.show()
-
-    plt.imshow(grey_map, plt.get_cmap('gray'))
     plt.show()
 
     plt.imshow(primary_map)
@@ -230,5 +222,9 @@ if __name__ == '__main__':
     plt.imshow(filter_map)
     plt.show()
 
-    plt.imshow(cropped)
+    plt.imshow(stripes)
     plt.show()
+
+    plt.imshow(dilate_stripes)
+    plt.show()
+

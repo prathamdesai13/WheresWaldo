@@ -4,10 +4,6 @@ import tensorflow as tf
 from numpy import array as np_array
 from numpy.random import shuffle
 
-from Probability_Map.WaldoPKL import load_waldo_pkl, load_not_waldo_pkl
-from Probability_Map.WaldoRecognitionTest import test_waldo
-
-
 def weight_variable(shape, name):
   initial = tf.truncated_normal(shape)
   return tf.Variable(initial, name=name)
