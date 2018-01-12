@@ -30,7 +30,7 @@ def test_waldo(path):
 
         a1 = accuracy.eval(feed_dict={input:batches[0], output:batches[1]})
         print("\nWaldo Accuracy:  ",(a1*100),"%")
-        # print(network.eval(feed_dict={input:batches[0]}))
+        print(network.eval(feed_dict={input:batches[0]}))
 
 
         batches = [[], []]
@@ -41,12 +41,13 @@ def test_waldo(path):
 
         a2 = accuracy.eval(feed_dict={input:batches[0], output:batches[1]})
         print("\nNot Waldo Accuracy:  ",(a2*100),"%")
-        # print(network.eval(feed_dict={input:batches[0]}))
+        print(network.eval(feed_dict={input:batches[0]}))
 
+        print("\nAverage Accuracy:  ", (a1 + a2) * 50, "%")
 
 
 
 
 if __name__ == "__main__":
     # train()
-    test_waldo("CNN Waldo Recognizer___2018-01-11_20.28.13")
+    test_waldo("CNN Waldo Recognizer___2018-01-11_21.22.59")
