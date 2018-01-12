@@ -25,7 +25,7 @@ def max_pool_2x2(x):
 input = tf.placeholder(tf.float32, shape=[None, 32, 32, 3], name="input")
 output = tf.placeholder(tf.float32, shape=[None, 2], name="output")
 
-weights1 = weight_variable([5, 5, 3, 64], "weights1")
+weights1 = weight_variable([3, 3, 3, 64], "weights1")
 biases1 = bias_variable([64], "biases1")
 
 reshaped_input = tf.reshape(input, [-1, 32, 32, 3])
@@ -33,7 +33,7 @@ reshaped_input = tf.reshape(input, [-1, 32, 32, 3])
 conv1 = tf.nn.relu(tf.add(conv2d(reshaped_input, weights1), biases1))
 pool1 = max_pool_2x2(conv1)
 
-weights2 = weight_variable([5, 5, 64, 128], "weights2")
+weights2 = weight_variable([3, 3, 64, 128], "weights2")
 biases2 = bias_variable([128], "biases2")
 
 conv2 = tf.nn.relu(tf.add(conv2d(pool1, weights2), biases2))
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
         training_data1 = load_waldo_pkl()
         training_data2 = load_not_waldo_pkl()
-        epoch = 7
+        epoch = 100
         start = time()
         for i in range(epoch):
             # if i%10 == 0:
@@ -82,7 +82,7 @@ if __name__ == "__main__":
                 batches[0].append(training_data1[i])
                 batches[1].append(np_array([1, 0]))
             shuffle(training_data2)
-            for i in range(30):
+            for i in range(25):
                 batches[0].append(training_data2[i])
                 batches[1].append(np_array([0, 1]))
             session.run(train_network, feed_dict={input: batches[0], output: batches[1]})
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
         print("\nAverage Accuracy:  ", (a1+a2)*50, "%")
 
-        if (a1+a2)/2 > 0.9:
+        if (a1+a2)/2 >= 0.87:
             saver = tf.train.Saver()
             path = "./CNN Waldo Recognizer___{}".format(strftime("%Y-%m-%d_%H.%M.%S"))
 
