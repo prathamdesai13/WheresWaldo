@@ -201,7 +201,7 @@ if __name__ == '__main__':
     red = (1.0, 0.0, 0.0)
 
     map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Cropped Waldos/Waldos 32x32/Waldo2.png")
-
+    print(map.shape)
     #map = plt.imread("Maps/19.png")
 
     primary_map = rgb_to_primary(map)

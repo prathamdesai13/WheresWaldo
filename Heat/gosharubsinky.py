@@ -76,12 +76,18 @@ def get_waldo_stripes(map):
 
     return stripes
 
-def process(filepath):
-
+def process(filepath=None, im=None):
+    map = None
     white = (1.0, 1.0, 1.0)
     red = (1.0, 0.0, 0.0)
+    if filepath is not None:
 
-    map = plt.imread(filepath)
+        map = plt.imread(filepath)
+
+    elif im is not None:
+
+        map = im
+
     primary_map = rgb_to_primary(map)
     filter_map = filter(primary_map, color=[red, white])
     stripes = get_waldo_stripes(filter_map)
