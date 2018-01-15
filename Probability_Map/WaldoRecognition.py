@@ -1,5 +1,5 @@
 from time import time, strftime
-
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from numpy import array as np_array
 from numpy.random import shuffle
