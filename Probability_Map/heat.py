@@ -183,11 +183,11 @@ def get_waldo_stripes(map):
 
             h, s, v = colorsys.rgb_to_hsv(r, g, b)
 
-            if (h < 0.05 or h > 0.95) and s > 0.4 and v > 0.4:
+            if (h < 0.05 or 0.95 < h) and 0.4 < s and 0.4 < v:
 
                 stripes[height, width] = map[height, width]
 
-            elif s < 0.2 and v > 0.9:
+            elif s < 0.2 and 0.9 < v:
 
                 stripes[height, width] = map[height, width]
 
@@ -200,18 +200,16 @@ if __name__ == '__main__':
     black = (0.0, 0.0, 0.0)
     red = (1.0, 0.0, 0.0)
 
-    map = plt.imread("Cropped Waldos/Waldos 32x32/Waldo2.png")
+    map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Cropped Waldos/Waldos 32x32/Waldo2.png")
 
-    map = plt.imread("Maps/19.png")
+    #map = plt.imread("Maps/19.png")
 
     primary_map = rgb_to_primary(map)
     filter_map = filter(primary_map, color=[(1.0, 0.0, 0.0), (1.0, 1.0, 1.0)])
 
-    #dilate_stripes = cv2.dilate(filter_map, np.ones((1, 1), np.uint8))
+    dilate_stripes = cv2.dilate(filter_map, np.ones((1, 1), np.uint8))
 
-    stripes = get_waldo_stripes(filter_map)
-
-    dilate_stripes = cv2.dilate(stripes, np.ones((1, 3), np.uint8))
+    stripes = get_waldo_stripes(dilate_stripes)
 
     plt.imshow(map)
     plt.show()
@@ -223,8 +221,5 @@ if __name__ == '__main__':
     plt.show()
 
     plt.imshow(stripes)
-    plt.show()
-
-    plt.imshow(dilate_stripes)
     plt.show()
 
