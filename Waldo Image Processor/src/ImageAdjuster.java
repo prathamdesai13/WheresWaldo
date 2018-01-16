@@ -11,16 +11,17 @@ import java.io.IOException;
 /**
  * Created by Antonio on 2018-01-03.
  */
-public class ImageAdjuster extends JPanel {
+public class ImageAdjuster {
 
     static final String path = "..";
 
     static int desiredWidth = 32, desiredHeight = 32;
     static int windowScale = 35;
-    static boolean zoom = true;
 
-    static File[] waldos = new File(path+"/Cropped Waldos/Waldos 35x35").listFiles(); //{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
+    static File[] waldos = new File(path+"/Cropped Waldos/Test Waldos 35x35/Waldos/").listFiles(); //{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
     static int waldo = -1; // Last Switched = 9_0_10.jpg
+
+    static String outputPath = path+"/Cropped Waldos/Test Waldos 32x32/Waldos/";
 
     public static void main(String[] args){
         ImageAdjuster ip = new ImageAdjuster();
@@ -33,84 +34,14 @@ public class ImageAdjuster extends JPanel {
             ip.saveWaldo();
             ip.moveImageToLeftSide();
             ip.saveWaldo();
-            ip.imageY += windowScale*ip.imageStep*1.5;
-            ip.imageX -= windowScale*ip.imageStep*1.5;
+            ip.centerImage();
             ip.saveWaldo();
         }
     }
 
-    int imageX = 0, imageY = 0, imageStep = 1;
+    int imageX = 0, imageY = 0;
     BufferedImage bi = null;
-    public ImageAdjuster(){
-        this.setSize(desiredWidth*windowScale, desiredHeight*windowScale);
-        //switchWaldo();
-        repaint();
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {}
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ADD){
-                    imageStep *= 2;
-                    System.out.println("ImageStep:   "+imageStep);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_SUBTRACT){
-                    imageStep /= 2;
-                    if (imageStep == 0) imageStep = 1;
-                    System.out.println("ImageStep:   "+imageStep);
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_UP){
-                    moveImageUp();
-                    repaint();
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_DOWN){
-                    moveImageDown();
-                    repaint();
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_LEFT){
-                    moveImageLeft();
-                    repaint();
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
-                    moveImageRight();
-                    repaint();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (zoom && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_S){
-                    saveWaldo();
-                }
-                else if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z){
-                    zoom = !zoom;
-                    System.out.println("Zoom turned "+(zoom ? "on" : "off"));
-                    repaint();
-                }
-                else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
-                    switchWaldo();
-                }
-            }
-        });
-    }
-
-    public void moveImageUp(){
-        imageY += windowScale*imageStep;
-        if (imageY > 0) moveImageToTop();
-    }
-    public void moveImageDown(){
-        imageY -= windowScale*imageStep;
-        if (imageY < -windowScale*(bi.getHeight()-desiredHeight)) moveImageToBottom();
-    }
-    public void moveImageLeft(){
-        imageX += windowScale*imageStep;
-        if (imageX > 0) moveImageToLeftSide();
-    }
-    public void moveImageRight(){
-        imageX -= windowScale*imageStep;
-        if (imageX < -windowScale*(bi.getWidth()-desiredWidth)) moveImageToRightSide();
-    }
     public void moveImageToTop(){
         imageY = 0;
     }
@@ -123,9 +54,13 @@ public class ImageAdjuster extends JPanel {
     public void moveImageToRightSide(){
         imageX = -windowScale*(bi.getWidth()-desiredWidth);
     }
+    public void centerImage(){
+        imageX = (desiredWidth-bi.getWidth())*windowScale/2;
+        imageY = (desiredHeight-bi.getHeight())*windowScale/2;
+    }
     public void saveWaldo(){
         try {
-            String[] croppedWaldos = new File(path+"/Cropped Waldos/Waldos 30x30").list();
+            String[] croppedWaldos = new File(outputPath).list();
             String outputFileName = "Waldo";
             NUM: for (int i = 1;; ++i){
                 for (String name : croppedWaldos){
@@ -136,7 +71,7 @@ public class ImageAdjuster extends JPanel {
                 outputFileName += i;
                 break;
             }
-            File outputfile = new File(path+"/Cropped Waldos/Waldos 30x30/"+outputFileName+".png");
+            File outputfile = new File(outputPath+outputFileName+".png");
             System.out.println(-imageX/windowScale+", "+-imageY/windowScale+", "+desiredWidth+", "+desiredHeight);
             ImageIO.write(bi.getSubimage(-imageX/windowScale, -imageY/windowScale, desiredWidth, desiredHeight), "png", outputfile);
 
@@ -152,9 +87,7 @@ public class ImageAdjuster extends JPanel {
                 bi = ImageIO.read(new FileInputStream(waldos[waldo].getAbsolutePath()));//
                 imageX = 0;
                 imageY = 0;
-                imageStep = 1;
                 windowScale = 35;
-                repaint();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -162,19 +95,6 @@ public class ImageAdjuster extends JPanel {
         else{
             System.out.println("All Waldos cropped!");
             System.exit(0);
-        }
-    }
-
-    @Override
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
-        if (bi != null){
-            if (zoom) {
-                g.drawImage(bi, imageX, imageY, windowScale * bi.getWidth(), windowScale * bi.getHeight(), null);
-            }
-            else{
-                g.drawImage(bi, 0, 0, getWidth(), getHeight(), null);
-            }
         }
     }
 

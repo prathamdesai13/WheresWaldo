@@ -4,7 +4,8 @@ import tensorflow as tf
 from numpy import array as np_array
 from numpy.random import shuffle
 
-from Probability_Map.WaldoPKL import load_waldo_pkl, load_not_waldo_pkl
+from Probability_Map.WaldoPKL import load_waldo_pkl, load_not_waldo_pkl, \
+                                     load_test_waldo_pkl, load_test_not_waldo_pkl
 
 
 def weight_variable(shape, name):
@@ -48,13 +49,16 @@ pool3 = max_pool_2x2(conv3)
 fc_weights1 = weight_variable([4 * 4 * 256, 256], "fc_weights1")
 fc_biases1 = bias_variable([256], "fc_biases1")
 
-h_pool3_flat = tf.reshape(pool3, [-1, 4 * 4 * 256])
-h_fc1 = tf.nn.relu(tf.add(tf.matmul(h_pool3_flat, fc_weights1), fc_biases1))
+pool3_flat = tf.reshape(pool3, [-1, 4 * 4 * 256])
+fc1 = tf.nn.relu(tf.add(tf.matmul(pool3_flat, fc_weights1), fc_biases1))
+
+keep_prob = tf.placeholder(tf.float32, name="keep_prob")
+fc1_drop = tf.nn.dropout(fc1, keep_prob)
 
 fc_weights2 = weight_variable([256, 2], "fc_weights2")
 fc_biases2 = bias_variable([2], "fc_biases2")
 
-network = tf.add(tf.matmul(h_fc1, fc_weights2), fc_biases2, name="network")
+network = tf.add(tf.matmul(fc1_drop, fc_weights2), fc_biases2, name="network")
 
 loss = tf.reduce_mean(
     tf.nn.softmax_cross_entropy_with_logits(labels=output, logits=network))
@@ -62,6 +66,21 @@ train_network = tf.train.AdamOptimizer(1e-4).minimize(loss)
 
 correct_prediction = tf.equal(tf.argmax(network, 1), tf.argmax(output, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="accuracy")
+
+
+def get_accuracy(training_data, label, set_name, forward=False):
+
+    batches = [[], []]
+    for data in training_data:
+        batches[0].append(data)
+        batches[1].append(label)
+
+    a = accuracy.eval(feed_dict={input: batches[0], output: batches[1], keep_prob:1})
+    print(set_name,"Accuracy:  ", (a * 100), "%","\n")
+    if forward:
+        print(network.eval(feed_dict={input:batches[0]}))
+
+    return a
 
 if __name__ == "__main__":
 
@@ -85,33 +104,19 @@ if __name__ == "__main__":
             for i in range(25):
                 batches[0].append(training_data2[i])
                 batches[1].append(np_array([0, 1]))
-            session.run(train_network, feed_dict={input: batches[0], output: batches[1]})
+            session.run(train_network, feed_dict={input: batches[0], output: batches[1], keep_prob:0.25})
         end = time()
         print("Took",(end-start),"Seconds to run",epoch,"Epochs")
 
-        test_data = [[], []]
-        for data in training_data1:
-            test_data[0].append(data)
-            test_data[1].append(np_array([1, 0]))
+        a1 = get_accuracy(training_data1, np_array([1, 0]), "Waldo")
+        a2 = get_accuracy(training_data2, np_array([0, 1]), "Not Waldo")
+        a3 = get_accuracy(load_test_waldo_pkl(), np_array([1, 0]), "Test Waldo")
+        a4 = get_accuracy(load_test_not_waldo_pkl(), np_array([0, 1]), "Test Not Waldo")
 
-        a1 = accuracy.eval(feed_dict={input: test_data[0], output: test_data[1]})
-        print("\nWaldo Accuracy:  ", (a1 * 100), "%")
+        print("\nAverage Accuracy:  ", (a1 + a2 + a3 + a4) * 25, "%")
 
-        test_data = [[], []]
-        training_data2 = load_not_waldo_pkl()
-        for data in training_data2:
-            test_data[0].append(data)
-            test_data[1].append(np_array([0, 1]))
-
-        a2 = accuracy.eval(feed_dict={input: test_data[0], output: test_data[1]})
-        print("\nNot Waldo Accuracy:  ", (a2 * 100), "%")
-
-        print("\nAverage Accuracy:  ", (a1+a2)*50, "%")
-
-        if (a1+a2)/2 >= 0.87:
+        if (a1+a2)/2 >= 0.95 and a3 > 0.5 and a4 > 0.5:
             saver = tf.train.Saver()
             path = "./CNN Waldo Recognizer___{}".format(strftime("%Y-%m-%d_%H.%M.%S"))
 
             print(saver.save(session, path))
-        # for data in training_data1:
-        #     print(wr.run(session, data))
