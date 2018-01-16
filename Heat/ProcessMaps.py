@@ -2,7 +2,7 @@ from _pickle import dump as to_pkl, load as load_pkl
 
 import matplotlib.pyplot as plt
 
-from Heat.gosharubsinky import process
+from Heat.HeatMap import process
 
 def process_and_pkl_map(path, output_path):
     print("Processing:   ",path)
