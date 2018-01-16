@@ -19,8 +19,10 @@ public class ImageProcessor extends JPanel {
     static int windowScale = 40;
     static boolean zoom = true;
 
-    static File[] waldos = new File(path+"/Hey-Waldo-master/256/waldo").listFiles();//{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
+    static File[] waldos = new File(path+"/Test Waldos/").listFiles();//{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
     static int waldo = -1;
+
+    static String outputPath = path+"/Cropped Waldos/Waldos 35x35/";
 
     public static void main(String[] args){
         ImageProcessor ip = new ImageProcessor();
@@ -90,6 +92,10 @@ public class ImageProcessor extends JPanel {
                     }
                     repaint();
                 }
+                else if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_SPACE){
+                    centerImage();
+                    repaint();
+                }
             }
 
             @Override
@@ -137,9 +143,13 @@ public class ImageProcessor extends JPanel {
     public void moveImageToRightSide(){
         imageX = -windowScale*(bi.getWidth()-desiredWidth);
     }
+    public void centerImage(){
+        imageX = (getWidth()-bi.getWidth()*windowScale)/2;
+        imageY = (getHeight()-bi.getHeight()*windowScale)/2;
+    }
     public void saveWaldo(){
         try {
-            String[] croppedWaldos = new File(path+"/Cropped Waldos/Waldos 35x35").list();
+            String[] croppedWaldos = new File(outputPath).list();
             String outputFileName = "Waldo";
             NUM: for (int i = 1;; ++i){
                 for (String name : croppedWaldos){
@@ -150,7 +160,7 @@ public class ImageProcessor extends JPanel {
                 outputFileName += i;
                 break;
             }
-            File outputfile = new File(path+"/Cropped Waldos/Waldos 35x35/"+outputFileName+".png");
+            File outputfile = new File(outputPath+outputFileName+".png");
             System.out.println(-imageX/windowScale+", "+-imageY/windowScale+", "+desiredWidth+", "+desiredHeight);
             ImageIO.write(bi.getSubimage(-imageX/windowScale, -imageY/windowScale, desiredWidth, desiredHeight), "png", outputfile);
 
