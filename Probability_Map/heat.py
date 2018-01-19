@@ -193,6 +193,7 @@ def get_waldo_stripes(map):
 
     return stripes
 
+
 if __name__ == '__main__':
 
     white = (1.0, 1.0, 1.0)
@@ -200,13 +201,12 @@ if __name__ == '__main__':
     red = (1.0, 0.0, 0.0)
 
     "================================"
-    #map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Cropped Waldos/Waldos 32x32/Waldo2.png")
-    map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Maps/18.png")
+    map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128/waldopng/0.png")
+    #map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Maps/Unprocessed/18.png")
     primary_map = rgb_to_primary(map)
     filter_map = filter(primary_map, color=[(1.0, 0.0, 0.0), (1.0, 1.0, 1.0)])
     dilate_stripes = cv2.dilate(filter_map, np.ones((1, 1), np.uint8))
     stripes = get_waldo_stripes(dilate_stripes)
-
 
     "================================"
     plt.imshow(map)
@@ -220,4 +220,3 @@ if __name__ == '__main__':
 
     plt.imshow(stripes)
     plt.show()
-

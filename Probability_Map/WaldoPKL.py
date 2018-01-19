@@ -4,7 +4,7 @@ from os import listdir
 import matplotlib.pyplot as plt
 from numpy import array as np_array
 
-from Heat.gosharubsinky import process
+from Heat.HeatMap import process
 
 dim = "32x32"
 
