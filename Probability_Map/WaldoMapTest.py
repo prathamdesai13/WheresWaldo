@@ -6,8 +6,9 @@ from numpy import array as np_array, reshape
 
 from Heat.ProcessMaps import read_processed_map
 
+dim = 64
 
-def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-15_22.02.30"):
+def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-19_17.29.33"):
     with tf.Session() as session:
 
         saver = tf.train.import_meta_graph(waldo_save+'.meta')
@@ -19,10 +20,10 @@ def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-15_22.
         network = graph.get_tensor_by_name("network:0")
 
         probability_map_input = []
-        for i in range(map.shape[0]//32):
+        for i in range(map.shape[0]//dim):
             # probability_map_input.append([])
-            for j in range(map.shape[1]//32):
-                probability_map_input.append(map[32*i:32*(i+1), 32*j:32*(j+1)])
+            for j in range(map.shape[1]//dim):
+                probability_map_input.append(map[dim*i:dim*(i+1), dim*j:dim*(j+1)])
 
         probability_map_input = np_array(probability_map_input)
         print(probability_map_input.shape)
@@ -38,7 +39,7 @@ def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-15_22.
         print(len(probability_map_input))
         print(len(probability_map))
         assert len(probability_map_input) == len(probability_map)
-        return reshape(a=np_array(probability_map), newshape=(map.shape[0]//32, map.shape[1]//32, 2))
+        return reshape(a=np_array(probability_map), newshape=(map.shape[0]//dim, map.shape[1]//dim, 2))
 
 # def check_probability_map_input(map, probability_map_input):
 #     print("Checking if Map matches Probability Map Input...")
@@ -61,7 +62,7 @@ def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-15_22.
 if __name__ == "__main__":
     print("Starting Map Test")
 
-    map = "7.png"
+    map = "3.png"
 
     original_map = np_array(plt.imread("../Maps/Unprocessed/"+map))
     print(original_map.shape)
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     start = time()
     analysed = get_probability_map(processed_map)
     probability_map = []
-    r = 0.1
+    r = 0.2
     for row in analysed:
         probability_map.append([])
         for x in row:
@@ -79,10 +80,10 @@ if __name__ == "__main__":
             probability_map[-1].append(p*r if p > (1-r) else 0)
 
     overlay = []
-    for i in range(original_map.shape[0]//32*32):
+    for i in range(original_map.shape[0]//dim*dim):
         overlay.append([])
-        for j in range(original_map.shape[1]//32*32):
-            overlay[-1].append(probability_map[i//32][j//32])
+        for j in range(original_map.shape[1]//dim*dim):
+            overlay[-1].append(probability_map[i//dim][j//dim])
 
     plt.imshow(original_map, cmap='jet')
     plt.imshow(overlay, cmap='gray', alpha=0.75)
