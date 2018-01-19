@@ -22,7 +22,7 @@ def max_pool_2x2(x):
                           strides=[1, 2, 2, 1], padding='SAME')
 
 input_dim = 64
-output_dim = int(input_dim/2/2/2)
+output_dim = int(input_dim/2/2)
 
 input = tf.placeholder(tf.float32, shape=[None, input_dim, input_dim, 3], name="input")
 output = tf.placeholder(tf.float32, shape=[None, 2], name="output")
@@ -41,22 +41,22 @@ biases2 = bias_variable([128], "biases2")
 conv2 = tf.nn.relu(tf.add(conv2d(pool1, weights2), biases2))
 pool2 = max_pool_2x2(conv2)
 
-weights3 = weight_variable([3, 3, 128, 256], "weights3")
-biases3 = bias_variable([256], "biases3")
+# weights3 = weight_variable([3, 3, 128, 256], "weights3")
+# biases3 = bias_variable([256], "biases3")
+#
+# conv3 = tf.nn.relu(tf.add(conv2d(pool2, weights3), biases3))
+# pool3 = max_pool_2x2(conv3)
 
-conv3 = tf.nn.relu(tf.add(conv2d(pool2, weights3), biases3))
-pool3 = max_pool_2x2(conv3)
+fc_weights1 = weight_variable([output_dim * output_dim * 128, 128], "fc_weights1")
+fc_biases1 = bias_variable([128], "fc_biases1")
 
-fc_weights1 = weight_variable([output_dim * output_dim * 256, 256], "fc_weights1")
-fc_biases1 = bias_variable([256], "fc_biases1")
-
-pool3_flat = tf.reshape(pool3, [-1, output_dim * output_dim * 256])
-fc1 = tf.nn.relu(tf.add(tf.matmul(pool3_flat, fc_weights1), fc_biases1))
+pool2_flat = tf.reshape(pool2, [-1, output_dim * output_dim * 128])
+fc1 = tf.nn.relu(tf.add(tf.matmul(pool2_flat, fc_weights1), fc_biases1))
 
 keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 fc1_drop = tf.nn.dropout(fc1, keep_prob)
 
-fc_weights2 = weight_variable([256, 2], "fc_weights2")
+fc_weights2 = weight_variable([128, 2], "fc_weights2")
 fc_biases2 = bias_variable([2], "fc_biases2")
 
 network = tf.add(tf.matmul(fc1_drop, fc_weights2), fc_biases2, name="network")
@@ -69,12 +69,17 @@ correct_prediction = tf.equal(tf.argmax(network, 1), tf.argmax(output, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="accuracy")
 
 
-def get_accuracy(test_batch, set_name, forward=False):
+def get_accuracy(test_data, set_name, forward=False):
 
-    a = accuracy.eval(feed_dict={input: batches[0], output: batches[1], keep_prob:1})
+    test_batch = [[], []]
+    for i in range(0, len(test_data)):
+        test_batch[0].append(test_data[i][0])
+        test_batch[1].append(test_data[i][1])
+
+    a = accuracy.eval(feed_dict={input: test_batch[0], output: test_batch[1], keep_prob:1})
     print(set_name,"Accuracy:  ", (a * 100), "%","\n")
     if forward:
-        print(network.eval(feed_dict={input:batches[0]}))
+        print(network.eval(feed_dict={input:test_batch[0]}))
 
     return a
 
@@ -95,16 +100,11 @@ if __name__ == "__main__":
             for i in range(50):
                 batches[0].append(training_data[i][0])
                 batches[1].append(training_data[i][1])
-            session.run(train_network, feed_dict={input: batches[0], output: batches[1], keep_prob:0.25})
+            session.run(train_network, feed_dict={input: batches[0], output: batches[1], keep_prob:0.5})
         end = time()
         print("Took",(end-start),"Seconds to run",epoch,"Epochs")
 
-        test_batch = [[], []]
-        for data in test_data:
-            test_batch[0].append(test_data[0])
-            test_batch[1].append(test_data[1])
-
-        a = get_accuracy(test_batch, "Test Batch")
+        a = get_accuracy(test_data, "Test Batch")
 
         if a > 0.5:
             saver = tf.train.Saver()
