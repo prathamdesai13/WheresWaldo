@@ -201,7 +201,7 @@ if __name__ == '__main__':
     red = (1.0, 0.0, 0.0)
 
     "================================"
-    map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128/waldopng/0.png")
+    map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256/waldopng/3.png")
     #map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Maps/Unprocessed/18.png")
     primary_map = rgb_to_primary(map)
     filter_map = filter(primary_map, color=[(1.0, 0.0, 0.0), (1.0, 1.0, 1.0)])

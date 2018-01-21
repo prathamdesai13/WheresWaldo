@@ -1,5 +1,8 @@
 from PIL import Image
 import os
+from Heat.HeatMap import process as heat
+import matplotlib.pyplot as plt
+from scipy import misc
 
 def jpg2png(images):
 
@@ -8,6 +11,7 @@ def jpg2png(images):
         ims = images[key]
         for i, path in enumerate(ims):
             im = Image.open(key + '/' + path)
+            im = heat(filepath=None, im=im)
             try:
                 os.mkdir(key + 'png/')
             except OSError:
@@ -16,6 +20,18 @@ def jpg2png(images):
 
             im.save(key + 'png/' + str(i) + '.png')
 
+
+def proc(images):
+    i = 0
+    for key in images:
+
+        image = images[key]
+        for path in image:
+
+            img = misc.imread(key + '/' +path) / 255.0
+            imagio = heat(filepath=None, im=img)
+            misc.imsave('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128bwprocess/' + str(i) + '.png', imagio)
+            i += 1
 
 def collect_image_paths(path):
 
@@ -27,43 +43,12 @@ if __name__ == '__main__':
 
     images = dict()
 
-    """images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128/notwaldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/notwaldo')"""
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-gray/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-gray/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-gray/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-gray/notwaldo')
+    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/waldopng'] = \
+        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/waldopng')
+    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/notwaldopng'] = \
+        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/notwaldopng')
 
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256/notwaldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-bw/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-bw/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-bw/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-bw/notwaldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-gray/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-gray/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-gray/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/256-gray/notwaldo')
 
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64/notwaldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-bw/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-bw/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-bw/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-bw/notwaldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-gray/waldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-gray/waldo')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-gray/notwaldo'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/64-gray/notwaldo')
+    #jpg2png(images)
 
-    jpg2png(images)
+    proc(images)
