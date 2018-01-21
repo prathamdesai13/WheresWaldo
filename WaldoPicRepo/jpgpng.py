@@ -1,8 +1,9 @@
 from PIL import Image
 import os
 from Heat.HeatMap import process as heat
-import matplotlib.pyplot as plt
 from scipy import misc
+
+# this code is very poorly written, i would not advising using it for anythign
 
 def jpg2png(images):
 
@@ -38,17 +39,3 @@ def collect_image_paths(path):
     image_paths = os.listdir(path)
 
     return image_paths
-
-if __name__ == '__main__':
-
-    images = dict()
-
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/waldopng'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/waldopng')
-    images['/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/notwaldopng'] = \
-        collect_image_paths('/Users/niravdesai/Desktop/WheresWaldo/WaldoPicRepo/128-bw/notwaldopng')
-
-
-    #jpg2png(images)
-
-    proc(images)
