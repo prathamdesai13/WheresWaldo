@@ -6,9 +6,9 @@ from numpy import array as np_array, reshape
 
 from Heat.ProcessMaps import read_processed_map
 
-dim = 64
+dim = 32
 
-def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-19_17.29.33"):
+def get_probability_map(map, waldo_save):
     with tf.Session() as session:
 
         saver = tf.train.import_meta_graph(waldo_save+'.meta')
@@ -62,7 +62,7 @@ def get_probability_map(map, waldo_save="./CNN Waldo Recognizer___2018-01-19_17.
 if __name__ == "__main__":
     print("Starting Map Test")
 
-    map = "3.png"
+    map = "7.png"
 
     original_map = np_array(plt.imread("../Maps/Unprocessed/"+map))
     print(original_map.shape)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     print("Analysing...")
     start = time()
-    analysed = get_probability_map(processed_map)
+    analysed = get_probability_map(processed_map, "./CNN Waldo Recognizer___2018-01-23_20.18.40")
     probability_map = []
     r = 0.2
     for row in analysed:
