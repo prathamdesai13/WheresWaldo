@@ -21,7 +21,7 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
 
-input_dim = 64
+input_dim = 32
 output_dim = int(input_dim/2/2)
 
 input = tf.placeholder(tf.float32, shape=[None, input_dim, input_dim, 3], name="input")
@@ -89,24 +89,38 @@ if __name__ == "__main__":
     with tf.Session() as session:
         session.run(tf.global_variables_initializer())
 
-        training_data, test_data = get_training_data()
+        waldo_data, not_waldo_train, not_waldo_test = get_training_data()
         epoch = 1000
         start = time()
         for i in range(epoch):
             if i%100 == 0:
                 print("Epoch:  ",i)
-            shuffle(training_data)
+            shuffle(waldo_data)
+            shuffle(not_waldo_train)
             batches = [[], []]
-            for i in range(50):
-                batches[0].append(training_data[i][0])
-                batches[1].append(training_data[i][1])
+            for i in range(10):
+                batches[0].append(waldo_data[i][0])
+                batches[1].append(waldo_data[i][1])
+                for j in range(15):
+                    batches[0].append(not_waldo_train[10*i+j][0])
+                    batches[1].append(not_waldo_train[10*i+j][1])
             session.run(train_network, feed_dict={input: batches[0], output: batches[1], keep_prob:0.5})
         end = time()
         print("Took",(end-start),"Seconds to run",epoch,"Epochs")
 
-        a = get_accuracy(test_data, "Test Batch")
+        test_data = []
+        for test in waldo_data:
+            test_data.append([test[0], test[1]])
 
-        if a > 0.5:
+        a1 = get_accuracy(test_data, "Waldo Test")
+
+        test_data = []
+        for test in not_waldo_test:
+            test_data.append([test[0], test[1]])
+
+        a2 = get_accuracy(test_data, "Not Waldo Test")
+
+        if a1 > 0.75 and a2 > 0.95:
             saver = tf.train.Saver()
             path = "./CNN Waldo Recognizer___{}".format(strftime("%Y-%m-%d_%H.%M.%S"))
 
