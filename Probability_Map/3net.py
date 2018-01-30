@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 from Probability_Map.WaldoPKL import load_waldo_pkl, load_not_waldo_pkl
 import matplotlib.pyplot as plt
-import Heat as heat
+from Heat import process
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 
@@ -31,7 +31,7 @@ def process_data(data):
 
         #x = np.reshape(x, [1, x.shape[0] * x.shape[1] * x.shape[2]])
 
-        proccessed_data.append((heat.process(filepath=None, im=x), y))
+        proccessed_data.append((process(filepath=None, im=x), y))
 
         x, y = proccessed_data[im_i]
 
@@ -39,29 +39,27 @@ def process_data(data):
 
     return proccessed_data
 
-def flatten(processed_data):
 
-    for i in range(len(processed_data)):
+def absolute_data(abs_path):
 
-        x, y = processed_data[i]
+    not_waldo = []
+    waldo = []
 
-        x = np.reshape(x, [1, 32 * 32 * 3])
-
-        processed_data[i] = (x[0], y)
-
-    return processed_data
+    for w in os.listdir():
 
 def network(data, height, width, channels):
 
-    vector = tf.placeholder(tf.float32, [1, height * width * channels])
-    target = tf.placeholder(tf.float32, [1, 1])
+    vector = tf.placeholder(tf.float32, [1, height * width * channels], name='Input')
+    target = tf.placeholder(tf.float32, [1, 1], name='Target')
 
-    weight_1 = tf.Variable(tf.truncated_normal([height * width * channels, 10], stddev=0.1))
-    bias_1 = tf.Variable(tf.zeros([10]))
-    weight_2 = tf.Variable(tf.truncated_normal([10, 5], stddev=0.1))
-    bias_2 = tf.Variable(tf.zeros([5]))
-    weight_3 = tf.Variable(tf.truncated_normal([5, 1], stddev=0.1))
-    bias_3 = tf.Variable(tf.zeros([1]))
+    weight_1 = tf.Variable(tf.truncated_normal([height * width * channels, 100], stddev=0.1), name='Weight1')
+    bias_1 = tf.Variable(tf.zeros([100]), name='Bias1')
+
+    weight_2 = tf.Variable(tf.truncated_normal([100, 50], stddev=0.1), name='Weight2')
+    bias_2 = tf.Variable(tf.zeros([50]), name='Bias2')
+
+    weight_3 = tf.Variable(tf.truncated_normal([50, 1], stddev=0.1), name='Weight3')
+    bias_3 = tf.Variable(tf.zeros([1]), name='Bias3')
 
     forward_1 = tf.nn.sigmoid(tf.matmul(vector, weight_1) + bias_1)
     forward_2 = tf.nn.sigmoid(tf.matmul(forward_1, weight_2) + bias_2)
@@ -69,7 +67,7 @@ def network(data, height, width, channels):
 
     cross_entropy = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=target, logits=forward_3))
 
-    training = tf.train.GradientDescentOptimizer(0.05).minimize(cross_entropy)
+    training = tf.train.GradientDescentOptimizer(0.005).minimize(cross_entropy)
 
     with tf.Session() as session:
 
@@ -84,19 +82,10 @@ def network(data, height, width, channels):
 
                 print(loss)
 
-        """test_vector = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Cropped Waldos/Test Waldos 32x32/Waldos/Waldo7.png")
-        plt.imshow(test_vector)
-        plt.show()
-        test_vector = heat.process(filepath=None, im=test_vector)
-        plt.imshow(test_vector)
-        plt.show()
-        test_vector = np.reshape(test_vector, (1, 32 * 32 * 3))
-        print(sigmoid(forward_3.eval(feed_dict={vector: test_vector})[0]))"""
-
         map = plt.imread("/Users/niravdesai/Desktop/WheresWaldo/Maps/Unprocessed/1.png")
         plt.imshow(map)
         plt.show()
-        map_vector = heat.process(filepath=None, im=map)
+        map_vector = process(filepath=None, im=map)
         plt.imshow(map_vector)
         plt.show()
         stride = 32
@@ -105,9 +94,9 @@ def network(data, height, width, channels):
             for width in range(map_vector.shape[1] - stride):
 
                 map_patch = map_vector[height:height + stride, width:width + stride, :]
-                map_patch_vector = np.reshape(map_patch, (1, 32 * 32 * 3))
+                map_patch_vector = np.reshape(map_patch, (1, 64 * 64 * 3))
 
-                probability = sigmoid(forward_3.eval(feed_dict={vector: map_patch_vector})[0])
+                probability = tf.sigmoid(forward_3.eval(feed_dict={vector: map_patch_vector})[0])
                 if probability > 0.96:
                     prob_map[height:height + stride, width:width + stride] = \
                         map[height:height + stride, width:width + stride, :]
@@ -119,10 +108,9 @@ def sigmoid(x):
 
     return 1.0 / (1.0 + np.exp(-x))
 
-
 if __name__ == '__main__':
 
     reg_data = load_data()
     data = process_data(reg_data)
 
-    network(data, 32, 32, 3)
+    network(data, 64, 64, 3)

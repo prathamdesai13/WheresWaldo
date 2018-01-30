@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from numpy import array as np_array, reshape
 
-from Heat.ProcessMaps import read_processed_map
+from Heat import read_processed_map
 
 dim = 32
 
