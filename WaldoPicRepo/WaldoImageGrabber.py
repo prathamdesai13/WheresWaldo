@@ -18,8 +18,8 @@ def process_images():
 
 # process_images()
 
-waldo_dirs = ["../WaldoPicRepo/32process/waldos/"]  # , "../WaldoPicRepo/64bwprocess/"
-not_waldo_dirs = ["../WaldoPicRepo/32process/notwaldos/"]  # , "../WaldoPicRepo/64bwprocess/"
+waldo_dirs = ["../WaldoPicRepo/32/waldos/"]  # , "../WaldoPicRepo/64bwprocess/"
+not_waldo_dirs = ["../WaldoPicRepo/32/notwaldos/"]  # , "../WaldoPicRepo/64bwprocess/"
 
 def get_training_data():
     print("Starting Image Grab")
@@ -42,13 +42,16 @@ def get_training_data():
     shuffle(waldo_data)
     shuffle(not_waldo_data)
 
-    not_waldo_test = not_waldo_data[:300]
-    not_waldo_train = not_waldo_data[300:]
+    waldo_test = waldo_data[:20]
+    waldo_train = waldo_data[20:]
+
+    not_waldo_test = not_waldo_data[:500]
+    not_waldo_train = not_waldo_data[500:]
 
     end = time()
     print("Took "+str(end-start)+" Seconds to grab images")
 
-    return waldo_data, not_waldo_train, not_waldo_test
+    return waldo_train, waldo_test, not_waldo_train, not_waldo_test
 
 
 

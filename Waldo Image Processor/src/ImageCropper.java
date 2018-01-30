@@ -14,30 +14,61 @@ public class ImageCropper {
     static int desiredWidth = 32, desiredHeight = 32;
     static int windowScale = 35;
 
-    static File[] waldos = new File(path+"/WaldoPicRepo/64process/notwaldos").listFiles(); //{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
+    static File[] waldos = new File(path+"/Cropped Waldos/Waldos 35x35").listFiles(); //{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
     static int waldo = -1; // Last Switched = 9_0_10.jpg
 
-    static String outputPath = path+"/WaldoPicRepo/32process/notwaldos/";
+    static String outputPath = path+"/WaldoPicRepo/32/waldos/";
 
     public static void main(String[] args){
         ImageCropper ip = new ImageCropper();
         while (waldo < waldos.length){
             ip.switchWaldo();
-            ip.saveWaldo();
-            ip.moveImageToRightSide();
-            ip.saveWaldo();
-            ip.moveImageToBottom();
-            ip.saveWaldo();
-            ip.moveImageToLeftSide();
-            ip.saveWaldo();
-            ip.centerImage();
-            ip.saveWaldo();
+            do {
+                do {
+                    ip.saveWaldo();
+                } while (ip.moveImageRight());
+                ip.moveImageToLeftSide();
+            } while (ip.moveImageDown());
+//            ip.centerImage();
+//            ip.saveWaldo();
         }
     }
 
     int imageX = 0, imageY = 0;
     BufferedImage bi = null;
 
+    public boolean moveImageUp(){
+        imageY += windowScale;
+        if (imageY > 0){
+            moveImageToTop();
+            return false;
+        }
+        return true;
+    }
+    public boolean moveImageDown(){
+        imageY -= windowScale;
+        if (imageY < -windowScale*(bi.getHeight()-desiredHeight)){
+            moveImageToBottom();
+            return false;
+        }
+        return true;
+    }
+    public boolean moveImageLeft(){
+        imageX += windowScale;
+        if (imageX > 0){
+            moveImageToLeftSide();
+            return false;
+        }
+        return true;
+    }
+    public boolean moveImageRight(){
+        imageX -= windowScale;
+        if (imageX < -windowScale*(bi.getWidth()-desiredWidth)){
+            moveImageToRightSide();
+            return false;
+        }
+        return true;
+    }
     public void moveImageToTop(){
         imageY = 0;
     }
