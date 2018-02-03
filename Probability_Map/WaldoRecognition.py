@@ -24,19 +24,22 @@ def max_pool_2x2(x):
 input_dim = 32
 output_dim = int(input_dim/2/2)
 
+k1 = 128
+k2 = 2*k1
+
 input = tf.placeholder(tf.float32, shape=[None, input_dim, input_dim, 3], name="input")
 output = tf.placeholder(tf.float32, shape=[None, 2], name="output")
 
-weights1 = weight_variable([3, 3, 3, 128], "weights1")
-biases1 = bias_variable([128], "biases1")
+weights1 = weight_variable([3, 3, 3, k1], "weights1")
+biases1 = bias_variable([k1], "biases1")
 
 reshaped_input = tf.reshape(input, [-1, input_dim, input_dim, 3])
 
 conv1 = tf.nn.relu(tf.add(conv2d(reshaped_input, weights1), biases1))
 pool1 = max_pool_2x2(conv1)
 
-weights2 = weight_variable([3, 3, 128, 256], "weights2")
-biases2 = bias_variable([256], "biases2")
+weights2 = weight_variable([3, 3, k1, k2], "weights2")
+biases2 = bias_variable([k2], "biases2")
 
 conv2 = tf.nn.relu(tf.add(conv2d(pool1, weights2), biases2))
 pool2 = max_pool_2x2(conv2)
@@ -47,10 +50,10 @@ pool2 = max_pool_2x2(conv2)
 # conv3 = tf.nn.relu(tf.add(conv2d(pool2, weights3), biases3))
 # pool3 = max_pool_2x2(conv3)
 
-fc_weights1 = weight_variable([output_dim * output_dim * 256, 128], "fc_weights1")
+fc_weights1 = weight_variable([output_dim * output_dim * k2, 128], "fc_weights1")
 fc_biases1 = bias_variable([128], "fc_biases1")
 
-pool2_flat = tf.reshape(pool2, [-1, output_dim * output_dim * 256])
+pool2_flat = tf.reshape(pool2, [-1, output_dim * output_dim * k2])
 fc1 = tf.nn.relu(tf.add(tf.matmul(pool2_flat, fc_weights1), fc_biases1))
 
 keep_prob = tf.placeholder(tf.float32, name="keep_prob")
@@ -99,10 +102,10 @@ if __name__ == "__main__":
             shuffle(waldo_train)
             shuffle(not_waldo_train)
             batches = [[], []]
-            for i in range(5):
+            for i in range(4):
                 batches[0].append(waldo_train[i][0])
                 batches[1].append(waldo_train[i][1])
-                for j in range(25):
+                for j in range(40):
                     batches[0].append(not_waldo_train[10*i+j][0])
                     batches[1].append(not_waldo_train[10*i+j][1])
             session.run(train_network, feed_dict={input: batches[0], output: batches[1], keep_prob:0.5})
@@ -127,7 +130,7 @@ if __name__ == "__main__":
 
         a2 = get_accuracy(_test_data, "Not Waldo Test")
 
-        if a1 > 0.9 and a3 > 0.85 and a2 > 0.95:
+        if a1 > 0.95 and a3 > 0.9 and a2 > 0.99:
             saver = tf.train.Saver()
             path = "./CNN Waldo Recognizer___{}".format(strftime("%Y-%m-%d_%H.%M.%S"))
 

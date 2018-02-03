@@ -2,13 +2,13 @@ from time import time
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from numpy import array as np_array, reshape, zeros, full, maximum
+from numpy import array as np_array, reshape, zeros, full, maximum, math
 
 from Heat.ProcessMaps import read_processed_map
 
 dim = 32
 
-def convolve_map(map, waldo_save, stride=int(dim/2/2)):
+def convolve_map(map, waldo_save, stride):
     with tf.Session() as session:
 
         saver = tf.train.import_meta_graph(waldo_save+'.meta')
@@ -50,9 +50,10 @@ def convolve_map(map, waldo_save, stride=int(dim/2/2)):
 if __name__ == "__main__":
     print("Starting Map Test")
 
-    map = "3.png"
-    save = "./CNN Waldo Recognizer___2018-01-29_21.18.48"
-    r = 0.9
+    map = "19.png"
+    save = "CNN Waldo Recognizer___2018-02-03_12.01.25"
+    numDisplay = 1
+    r = 0.82
     r_1 = 1-r
 
     original_map = np_array(plt.imread("../Maps/Unprocessed/"+map))
@@ -62,22 +63,48 @@ if __name__ == "__main__":
     print("Analysing...")
     start = time()
 
-    locations, probabilities = convolve_map(original_map, save)
-
-    end = time()
-    print("Took",(end-start),"Seconds to analyse")
-    start = time()
-
-    overlay = zeros(original_map.shape[0:2])
-    print(overlay.shape)
-    for l, x in zip(locations, probabilities):
-        p = abs(x[0])/(abs(x[0])+abs(x[1]))
-        p = p*r_1 if p > r else 0
-        section = full((dim, dim), p)
-        overlay[l[0]:l[0]+dim, l[1]:l[1]+dim] = maximum(overlay[l[0]:l[0]+dim, l[1]:l[1]+dim], section)
+    locations, outputs = convolve_map(original_map, save, int(dim/2/2))
 
     end = time()
     print("Took",(end-start),"Seconds to process")
+    start = time()
+
+    probabilities = []
+    top = []
+    if numDisplay <= 0:
+        for l, x in zip(locations, outputs):
+            p = 1/(1+math.exp(-(x[0]-x[1])/3))
+            probabilities.append(p)
+    else:
+        for l, x in zip(locations, outputs):
+            p = 1/(1+math.exp(-(x[0]-x[1])/3))
+            probabilities.append(p)
+            if len(top) < numDisplay:
+                top.append([l, p])
+                if len(top) == numDisplay:
+                    top.sort(key=lambda x: x[1], reverse=True)
+            else:
+                for i in range(numDisplay):
+                    if p > top[i][1]:
+                        top[i] = [l, p]
+                        break
+
+    overlay = zeros(original_map.shape[0:2])
+    print(overlay.shape)
+    if numDisplay > 0:
+        print(top)
+        for i in range(numDisplay):
+            l = top[i][0]
+            p = top[i][1]
+            section = full((dim, dim), p)
+            overlay[l[0]:l[0]+dim, l[1]:l[1]+dim] = maximum(overlay[l[0]:l[0]+dim, l[1]:l[1]+dim], section)
+    else:
+        for l, p in zip(locations, probabilities):
+            section = full((dim, dim), p*r_1 if p > r else 0)
+            overlay[l[0]:l[0]+dim, l[1]:l[1]+dim] = maximum(overlay[l[0]:l[0]+dim, l[1]:l[1]+dim], section)
+
+    end = time()
+    print("Took",(end-start),"Seconds to analyse")
 
 
     plt.imshow(original_map, cmap='jet')
