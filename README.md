@@ -8,11 +8,11 @@ The trained model performs a convolution with a set stride on the map and output
 
 Below are examples of maps where the model was able to locate Waldo:
 
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%201.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%203.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%206.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%207.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%209.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%2014.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%2015.png")
-[]("https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%2019.png")
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%201.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%203.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%206.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%207.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%209.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%2014.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%2015.png)
+![](https://github.com/antoniok9130/WheresWaldo/blob/master/Examples/Map%2019.png)
