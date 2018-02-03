@@ -15,14 +15,14 @@ public class ImageProcessor extends JPanel {
 
     static final String path = "..";
 
-    static int desiredWidth = 35, desiredHeight = 35;
-    static int windowScale = 40;
+    static int desiredWidth = 1024, desiredHeight = 727;
+    static int windowScale = 1;
     static boolean zoom = true;
 
-    static File[] waldos = new File(path+"/Test Waldos/").listFiles();//{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
+    static File[] waldos = new File(path+"/Maps/Test/").listFiles();//{"C:\\Users\\Antonio\\OneDrive - University of Waterloo\\Projects\\PycharmProjects\\WheresWaldo\\Maps\\4.png"};//
     static int waldo = -1;
 
-    static String outputPath = path+"/Cropped Waldos/Waldos 35x35/";
+    static String outputPath = path+"/Maps/Test/";
 
     public static void main(String[] args){
         ImageProcessor ip = new ImageProcessor();
