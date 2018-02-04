@@ -1,4 +1,4 @@
-# WheresWaldo
+# There's Waldo!
 
 Built a model that is able to find Waldo in a Where's Waldo map with relative success.
 
