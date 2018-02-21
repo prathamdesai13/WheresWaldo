@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from numpy import array as np_array, reshape, zeros, full, maximum, math
 
-from Heat.ProcessMaps import read_processed_map
-
 dim = 32
 
 def convolve_map(map, waldo_save, stride):
