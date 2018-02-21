@@ -2,7 +2,7 @@ from time import time
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from numpy import array as np_array, reshape, zeros, full, maximum, math
+from numpy import array as np_array, zeros, full, maximum, math
 
 dim = 32
 
